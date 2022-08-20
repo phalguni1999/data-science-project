@@ -1,0 +1,99 @@
+#IMPORT ALL THE REQUIRED LIBRARIES
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import itertools
+import gc
+import os
+import sys
+from sklearn.linear_model import LinearRegression
+
+#IMPORTING THE DATASET
+
+cab_data = pd.read_csv("uber_data.csv")
+#TO SHOW THE 1ST FIVE ROW OF THE DATASET
+print(cab_data.head())
+
+weather_data = pd.read_csv("weather_data.csv")
+
+print(weather_data.head())
+
+
+#TO SHOW THE SHAPE OF THE DATASET 
+
+print(cab_data.shape)
+
+print(weather_data.shape)
+
+#TO SHOW THE SIZE OF THE DATASET
+
+print(cab_data.size)
+
+print(weather_data.size)
+
+#TO SHOW THE WHAT ARE THE COLUMNS ARE PRESENT IN THE DATASET
+
+print(cab_data.columns)
+
+print(weather_data.columns)
+
+#DESCRIBE DATASET
+
+print(cab_data.describe())
+
+print(weather_data.describe())
+
+#CONCAT BOTH THE DATASET
+
+uw_data = pd.concat([cab_data , weather_data])
+
+print("----new data set after concat both the dataset------")
+print(uw_data.head())
+
+print(uw_data.columns)
+
+#GROUP YOUR DATA ACCORDING TO "CAB_TYPE" COLUMN IN THE "UW_DATA" DATASET
+print(uw_data.groupby("cab_type").count())
+
+#PLOT THE BAR CHART
+uw_data.groupby("cab_type").count().plot.bar()
+
+#PLOT THE BARCHART OF THE "PRICE" COLUMN
+uw_data["price"].value_counts().plot(kind = 'bar' , figsize = (100,50) , color = 'blue') 
+
+#PLOT THE GRAPH BETWEEN "RAIN" AND "PRICE"(TO SEE HOW PRICE CHANGE ACCORING TO RAIN)
+
+x = uw_data['rainfall']
+y = uw_data["price"]
+
+plt.plot(x , y)
+plt.show()
+
+#NOW APPLYING ML PART 
+
+x1 = uw_data[['distance' , 'temp' , 'pressure' , 'humidity' , 'windspeed' , 'rainfall' ]]
+y1 = uw_data['price']
+
+#USING SCIKIT_LEARN TO SPLIT THE DATA INTO TRAINDATA AND TESTDATA
+from sklearn.model_selection import train_test_split
+
+x_train , y_train , x_test , y_test = train_test_split(x1 , y1 , test_size = .25 , random_state = 42)
+
+linear = LinearRegression()
+linear.fit(x_train , x_test)
+
+predictions = linear.predict(y_train)
+print(predictions)
+
+df = pd.dataframe({'actual' : y_test , 'predicted' : predictions})
+print(df)
+
+df1 = df.head(25)
+df1.plot(kind = 'bar' , figsize=(25,10))
+plt.grid(which = 'major' , linestyle = '-' , linewidth = '0.5' , color = 'green')
+plt.grid(which = 'minor' , linestyle = ':' , linewidth = '0.5' , color = 'black')
+plt.show()
+
+#END
